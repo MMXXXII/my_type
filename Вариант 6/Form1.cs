@@ -1,6 +1,4 @@
-using System;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 namespace Вариант_6
 {
@@ -15,25 +13,51 @@ namespace Вариант_6
         {
             try
             {
-                // Читаем текст из полей, если пусто, то присваиваем "0"
-                string firstText = string.IsNullOrWhiteSpace(txtFirst.Text) ? "0" : txtFirst.Text;
-                string secondText = string.IsNullOrWhiteSpace(txtSecond.Text) ? "0" : txtSecond.Text;
+                // Читаем текст из первого поля
+                string firstText;
+                if (string.IsNullOrWhiteSpace(txtFirst.Text))
+                {
+                    firstText = "0";
+                }
+                else
+                {
+                    firstText = txtFirst.Text;
+                }
 
-                // Выбор системы счисления для первого и второго числа
-                int baseFirst = GetBaseFromComboBox(comboBox1.SelectedItem.ToString());
-                int baseSecond = GetBaseFromComboBox(comboBox2.SelectedItem.ToString());
+                // Читаем текст из второго поля
+                string secondText;
+                if (string.IsNullOrWhiteSpace(txtSecond.Text))
+                {
+                    secondText = "0";
+                }
+                else
+                {
+                    secondText = txtSecond.Text;
+                }
 
-                // Проверка на правильность ввода в соответствии с выбранной системой счисления
-                if (!IsValidInput(firstText, baseFirst) || !IsValidInput(secondText, baseSecond))
+                // Получаем основание системы счисления из первого выпадающего списка
+                string selectedItem1 = comboBox1.SelectedItem.ToString();
+                int baseFirst = GetBaseFromComboBox(selectedItem1);
+
+                // Получаем основание системы счисления из второго выпадающего списка
+                string selectedItem2 = comboBox2.SelectedItem.ToString();
+                int baseSecond = GetBaseFromComboBox(selectedItem2);
+
+                // Проверяем, правильные ли данные введены
+                bool isFirstValid = IsValidInput(firstText, baseFirst);
+                bool isSecondValid = IsValidInput(secondText, baseSecond);
+
+                if (isFirstValid == false || isSecondValid == false)
                 {
                     txtResult.Text = "Неверный ввод!";
                     return;
                 }
 
-                // Преобразуем из строки в десятичное число в зависимости от выбранной системы счисления
+                // Преобразуем строки в целые числа (в десятичной системе)
                 int firstValue = Convert.ToInt32(firstText, baseFirst);
                 int secondValue = Convert.ToInt32(secondText, baseSecond);
 
+                // Объявляем переменную для хранения результата
                 int resultValue = 0;
 
                 // Выполнение выбранной операции
@@ -49,7 +73,14 @@ namespace Вариант_6
                         resultValue = firstValue * secondValue;
                         break;
                     case "Сравнение":
-                        txtResult.Text = firstValue == secondValue ? "Числа равны" : "Числа не равны";
+                        if (firstValue == secondValue)
+                        {
+                            txtResult.Text = "Числа равны";
+                        }
+                        else
+                        {
+                            txtResult.Text = "Числа не равны";
+                        }
                         return;
                     default:
                         resultValue = 0;
@@ -60,7 +91,7 @@ namespace Вариант_6
                 int resultBase = GetBaseFromComboBox(comboBox3.SelectedItem.ToString()); // Результат в системе, выбранной в comboBox3
 
                 string resultString = Convert.ToString(resultValue, resultBase).ToUpper();
-
+                    
                 // Выводим результат в поле txtResult
                 txtResult.Text = resultString;
             }
@@ -95,17 +126,22 @@ namespace Вариант_6
         // Метод для проверки корректности ввода
         private bool IsValidInput(string input, int numberBase)
         {
-            string pattern = numberBase switch
-            {
-                2 => "^[01]*$",         // Для двоичной системы
-                8 => "^[0-7]*$",         // Для восьмиричной системы
-                10 => "^[0-9]*$",        // Для десятичной системы
-                16 => "^[0-9A-Fa-f]*$",  // Для шестнадцатиричной системы
-                _ => throw new ArgumentException("Неправильная система счисления")
-            };
+            string pattern = "";
+
+            if (numberBase == 2)
+                pattern = "^[01]*$"; // Только 0 и 1
+            else if (numberBase == 8)
+                pattern = "^[0-7]*$"; // Только от 0 до 7
+            else if (numberBase == 10)
+                pattern = "^[0-9]*$"; // Только цифры
+            else if (numberBase == 16)
+                pattern = "^[0-9A-Fa-f]*$"; // Цифры и буквы от A до F
+            else
+                throw new ArgumentException("Неправильная система счисления");
 
             return Regex.IsMatch(input, pattern);
         }
+
 
         // Обработчик изменения текста в первом поле
         private void txtFirst_TextChanged(object sender, EventArgs e)

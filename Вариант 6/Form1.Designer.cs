@@ -42,7 +42,7 @@
             // 
             // txtFirst
             // 
-            txtFirst.Location = new Point(169, 41);
+            txtFirst.Location = new Point(169, 29);
             txtFirst.Name = "txtFirst";
             txtFirst.Size = new Size(170, 27);
             txtFirst.TabIndex = 0;
@@ -50,7 +50,7 @@
             // 
             // txtResult
             // 
-            txtResult.Location = new Point(160, 213);
+            txtResult.Location = new Point(160, 201);
             txtResult.Name = "txtResult";
             txtResult.Size = new Size(327, 27);
             txtResult.TabIndex = 2;
@@ -60,7 +60,7 @@
             cmbOperation.Anchor = AnchorStyles.None;
             cmbOperation.FormattingEnabled = true;
             cmbOperation.Items.AddRange(new object[] { "Сложение", "Вычитание", "Умножение", "Сравнение" });
-            cmbOperation.Location = new Point(269, 165);
+            cmbOperation.Location = new Point(269, 148);
             cmbOperation.Name = "cmbOperation";
             cmbOperation.Size = new Size(138, 28);
             cmbOperation.TabIndex = 3;
@@ -71,7 +71,7 @@
             // 
             comboBox1.FormattingEnabled = true;
             comboBox1.Items.AddRange(new object[] { "Двоичная", "Восьмиричная", "Десятичная", "Шеснадцатиричная" });
-            comboBox1.Location = new Point(398, 41);
+            comboBox1.Location = new Point(398, 29);
             comboBox1.Name = "comboBox1";
             comboBox1.Size = new Size(151, 28);
             comboBox1.TabIndex = 4;
@@ -80,7 +80,7 @@
             // 
             // txtSecond
             // 
-            txtSecond.Location = new Point(169, 103);
+            txtSecond.Location = new Point(169, 91);
             txtSecond.Name = "txtSecond";
             txtSecond.Size = new Size(170, 27);
             txtSecond.TabIndex = 5;
@@ -90,7 +90,7 @@
             // 
             comboBox2.FormattingEnabled = true;
             comboBox2.Items.AddRange(new object[] { "Двоичная", "Восьмиричная", "Десятичная", "Шеснадцатиричная" });
-            comboBox2.Location = new Point(398, 103);
+            comboBox2.Location = new Point(398, 91);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(151, 28);
             comboBox2.TabIndex = 6;
@@ -100,7 +100,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(45, 44);
+            label1.Location = new Point(45, 32);
             label1.Name = "label1";
             label1.Size = new Size(114, 20);
             label1.TabIndex = 7;
@@ -109,7 +109,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(48, 110);
+            label2.Location = new Point(48, 98);
             label2.Name = "label2";
             label2.Size = new Size(111, 20);
             label2.TabIndex = 8;
@@ -118,7 +118,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(48, 216);
+            label3.Location = new Point(48, 204);
             label3.Name = "label3";
             label3.Size = new Size(78, 20);
             label3.TabIndex = 9;
@@ -128,7 +128,7 @@
             // 
             comboBox3.FormattingEnabled = true;
             comboBox3.Items.AddRange(new object[] { "Двоичная", "Восьмиричная", "Десятичная", "Шеснадцатиричная" });
-            comboBox3.Location = new Point(516, 213);
+            comboBox3.Location = new Point(516, 201);
             comboBox3.Name = "comboBox3";
             comboBox3.Size = new Size(151, 28);
             comboBox3.TabIndex = 10;
@@ -139,7 +139,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(688, 298);
+            ClientSize = new Size(688, 264);
             Controls.Add(comboBox3);
             Controls.Add(label3);
             Controls.Add(label2);
