@@ -1,4 +1,5 @@
-using System.Text.RegularExpressions;
+using System;
+using System.Windows.Forms;
 
 namespace Вариант_6
 {
@@ -7,93 +8,60 @@ namespace Вариант_6
         public Form1()
         {
             InitializeComponent();
+
+            // Навешиваем события (если не сделано в дизайнере)
+            txtFirst.TextChanged += InputChanged;
+            txtSecond.TextChanged += InputChanged;
+            cmbOperation.SelectedIndexChanged += InputChanged;
+            comboBox1.SelectedIndexChanged += InputChanged;
+            comboBox2.SelectedIndexChanged += InputChanged;
+            comboBox3.SelectedIndexChanged += InputChanged;
+        }
+
+        private void InputChanged(object sender, EventArgs e)
+        {
+            Calculate();
         }
 
         private void Calculate()
         {
             try
             {
-                // Читаем текст из первого поля
-                string firstText;
-                if (string.IsNullOrWhiteSpace(txtFirst.Text))
-                {
-                    firstText = "0";
-                }
-                else
-                {
-                    firstText = txtFirst.Text;
-                }
+                // Получаем текст из полей, если пусто — заменяем на 0
+                string firstText = string.IsNullOrWhiteSpace(txtFirst.Text) ? "0" : txtFirst.Text;
+                string secondText = string.IsNullOrWhiteSpace(txtSecond.Text) ? "0" : txtSecond.Text;
 
-                // Читаем текст из второго поля
-                string secondText;
-                if (string.IsNullOrWhiteSpace(txtSecond.Text))
-                {
-                    secondText = "0";
-                }
-                else
-                {
-                    secondText = txtSecond.Text;
-                }
+                // Определяем основания систем счисления
+                int baseFirst = NumberBaseOperations.GetBase(comboBox1.SelectedItem?.ToString() ?? "Десятичная");
+                int baseSecond = NumberBaseOperations.GetBase(comboBox2.SelectedItem?.ToString() ?? "Десятичная");
+                int baseResult = NumberBaseOperations.GetBase(comboBox3.SelectedItem?.ToString() ?? "Десятичная");
 
-                // Получаем основание системы счисления из первого выпадающего списка
-                string selectedItem1 = comboBox1.SelectedItem.ToString();
-                int baseFirst = GetBaseFromComboBox(selectedItem1);
-
-                // Получаем основание системы счисления из второго выпадающего списка
-                string selectedItem2 = comboBox2.SelectedItem.ToString();
-                int baseSecond = GetBaseFromComboBox(selectedItem2);
-
-                // Проверяем, правильные ли данные введены
-                bool isFirstValid = IsValidInput(firstText, baseFirst);
-                bool isSecondValid = IsValidInput(secondText, baseSecond);
-
-                if (isFirstValid == false || isSecondValid == false)
+                // Проверка на валидность ввода
+                if (!NumberBaseOperations.IsValidInput(firstText, baseFirst) ||
+                    !NumberBaseOperations.IsValidInput(secondText, baseSecond))
                 {
                     txtResult.Text = "Неверный ввод!";
                     return;
                 }
 
-                // Преобразуем строки в целые числа (в десятичной системе)
-                int firstValue = Convert.ToInt32(firstText, baseFirst);
-                int secondValue = Convert.ToInt32(secondText, baseSecond);
+                // Переводим в десятичную
+                int firstValue = NumberBaseOperations.ConvertToDecimal(firstText, baseFirst);
+                int secondValue = NumberBaseOperations.ConvertToDecimal(secondText, baseSecond);
 
-                // Объявляем переменную для хранения результата
-                int resultValue = 0;
+                // Выполняем операцию
+                string operation = cmbOperation.Text;
+                string result = NumberBaseOperations.PerformOperation(firstValue, secondValue, operation);
 
-                // Выполнение выбранной операции
-                switch (cmbOperation.Text)
+                // Если сравнение — выводим строку
+                if (operation == "Сравнение")
                 {
-                    case "Сложение":
-                        resultValue = firstValue + secondValue;
-                        break;
-                    case "Вычитание":
-                        resultValue = firstValue - secondValue;
-                        break;
-                    case "Умножение":
-                        resultValue = firstValue * secondValue;
-                        break;
-                    case "Сравнение":
-                        if (firstValue == secondValue)
-                        {
-                            txtResult.Text = "Числа равны";
-                        }
-                        else
-                        {
-                            txtResult.Text = "Числа не равны";
-                        }
-                        return;
-                    default:
-                        resultValue = 0;
-                        break;
+                    txtResult.Text = result;
+                    return;
                 }
 
-                // Выбор системы счисления для вывода результата
-                int resultBase = GetBaseFromComboBox(comboBox3.SelectedItem.ToString()); // Результат в системе, выбранной в comboBox3
-
-                string resultString = Convert.ToString(resultValue, resultBase).ToUpper();
-                    
-                // Выводим результат в поле txtResult
-                txtResult.Text = resultString;
+                // Остальные операции — это числа, их надо перевести в нужную систему
+                int resultValue = int.Parse(result);
+                txtResult.Text = NumberBaseOperations.ConvertFromDecimal(resultValue, baseResult);
             }
             catch (FormatException)
             {
@@ -103,75 +71,10 @@ namespace Вариант_6
             {
                 txtResult.Text = "Слишком большое число";
             }
-        }
-
-        // Метод для получения базы из выбранной системы счисления
-        private int GetBaseFromComboBox(string selectedItem)
-        {
-            switch (selectedItem)
+            catch (Exception)
             {
-                case "Двоичная":
-                    return 2;
-                case "Восьмиричная":
-                    return 8;
-                case "Десятичная":
-                    return 10;
-                case "Шестнадцатиричная":
-                    return 16;
-                default:
-                    return 10;
+                txtResult.Text = "Непредвиденная ошибка";
             }
-        }
-
-        // Метод для проверки корректности ввода
-        private bool IsValidInput(string input, int numberBase)
-        {
-            string pattern = "";
-
-            if (numberBase == 2)
-                pattern = "^[01]*$"; // Только 0 и 1
-            else if (numberBase == 8)
-                pattern = "^[0-7]*$"; // Только от 0 до 7
-            else if (numberBase == 10)
-                pattern = "^[0-9]*$"; // Только цифры
-            else if (numberBase == 16)
-                pattern = "^[0-9A-Fa-f]*$"; // Цифры и буквы от A до F
-            else
-                throw new ArgumentException("Неправильная система счисления");
-
-            return Regex.IsMatch(input, pattern);
-        }
-
-
-        // Обработчик изменения текста в первом поле
-        private void txtFirst_TextChanged(object sender, EventArgs e)
-        {
-            Calculate(); // Вызываем перерасчет
-        }
-
-        private void txtSecond_TextChanged(object sender, EventArgs e)
-        {
-            Calculate(); // Вызываем перерасчет
-        }
-
-        private void cmbOperation_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Calculate();
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Calculate(); // Перерасчет при изменении первого комбо-бокса
-        }
-
-        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Calculate(); // Перерасчет при изменении второго комбо-бокса
-        }
-
-        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            Calculate(); // Перерасчет при изменении третьего комбо-бокса (результат)
         }
     }
 }

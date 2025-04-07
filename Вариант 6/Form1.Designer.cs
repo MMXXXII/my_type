@@ -46,7 +46,8 @@
             txtFirst.Name = "txtFirst";
             txtFirst.Size = new Size(170, 27);
             txtFirst.TabIndex = 0;
-            txtFirst.TextChanged += txtFirst_TextChanged;
+            this.txtFirst.TextChanged += new System.EventHandler(this.InputChanged);
+
             // 
             // txtResult
             // 
@@ -65,7 +66,7 @@
             cmbOperation.Size = new Size(138, 28);
             cmbOperation.TabIndex = 3;
             cmbOperation.Text = "Сложение";
-            cmbOperation.SelectedIndexChanged += cmbOperation_SelectedIndexChanged;
+            this.cmbOperation.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
             // 
             // comboBox1
             // 
@@ -76,7 +77,7 @@
             comboBox1.Size = new Size(151, 28);
             comboBox1.TabIndex = 4;
             comboBox1.Text = "Двоичная";
-            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
             // 
             // txtSecond
             // 
@@ -84,7 +85,7 @@
             txtSecond.Name = "txtSecond";
             txtSecond.Size = new Size(170, 27);
             txtSecond.TabIndex = 5;
-            txtSecond.TextChanged += txtSecond_TextChanged;
+            this.txtSecond.TextChanged += new System.EventHandler(this.InputChanged);
             // 
             // comboBox2
             // 
@@ -95,7 +96,7 @@
             comboBox2.Size = new Size(151, 28);
             comboBox2.TabIndex = 6;
             comboBox2.Text = "Двоичная";
-            comboBox2.SelectedIndexChanged += comboBox2_SelectedIndexChanged;
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
             // 
             // label1
             // 
@@ -133,7 +134,7 @@
             comboBox3.Size = new Size(151, 28);
             comboBox3.TabIndex = 10;
             comboBox3.Text = "Двоичная";
-            comboBox3.SelectedIndexChanged += comboBox3_SelectedIndexChanged;
+            this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
             // 
             // Form1
             // 
@@ -168,5 +169,7 @@
         private Label label2;
         private Label label3;
         private ComboBox comboBox3;
+
+
     }
 }
