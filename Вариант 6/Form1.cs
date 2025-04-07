@@ -1,6 +1,3 @@
-using System;
-using System.Windows.Forms;
-
 namespace Вариант_6
 {
     public partial class Form1 : Form
@@ -8,14 +5,6 @@ namespace Вариант_6
         public Form1()
         {
             InitializeComponent();
-
-            // Навешиваем события (если не сделано в дизайнере)
-            txtFirst.TextChanged += InputChanged;
-            txtSecond.TextChanged += InputChanged;
-            cmbOperation.SelectedIndexChanged += InputChanged;
-            comboBox1.SelectedIndexChanged += InputChanged;
-            comboBox2.SelectedIndexChanged += InputChanged;
-            comboBox3.SelectedIndexChanged += InputChanged;
         }
 
         private void InputChanged(object sender, EventArgs e)
@@ -27,41 +16,67 @@ namespace Вариант_6
         {
             try
             {
-                // Получаем текст из полей, если пусто — заменяем на 0
-                string firstText = string.IsNullOrWhiteSpace(txtFirst.Text) ? "0" : txtFirst.Text;
-                string secondText = string.IsNullOrWhiteSpace(txtSecond.Text) ? "0" : txtSecond.Text;
+                // Получаем значения из текстовых полей, если пусто — ставим 0
+                string firstInput = txtFirst.Text;
+                string secondInput = txtSecond.Text;
 
-                // Определяем основания систем счисления
-                int baseFirst = NumberBaseOperations.GetBase(comboBox1.SelectedItem?.ToString() ?? "Десятичная");
-                int baseSecond = NumberBaseOperations.GetBase(comboBox2.SelectedItem?.ToString() ?? "Десятичная");
-                int baseResult = NumberBaseOperations.GetBase(comboBox3.SelectedItem?.ToString() ?? "Десятичная");
+                if (string.IsNullOrWhiteSpace(firstInput))
+                {
+                    firstInput = "0";
+                }
 
-                // Проверка на валидность ввода
-                if (!NumberBaseOperations.IsValidInput(firstText, baseFirst) ||
-                    !NumberBaseOperations.IsValidInput(secondText, baseSecond))
+                if (string.IsNullOrWhiteSpace(secondInput))
+                {
+                    secondInput = "0";
+                }
+
+                // Смотрим, какие системы счисления выбраны (с использованием обычных условий)
+                string firstBaseStr = "Десятичная";
+                if (comboBox1.SelectedItem != null)
+                {
+                    firstBaseStr = comboBox1.SelectedItem.ToString();
+                }
+
+                string secondBaseStr = "Десятичная";
+                if (comboBox2.SelectedItem != null)
+                {
+                    secondBaseStr = comboBox2.SelectedItem.ToString();
+                }
+
+                string resultBaseStr = "Десятичная";
+                if (comboBox3.SelectedItem != null)
+                {
+                    resultBaseStr = comboBox3.SelectedItem.ToString();
+                }
+
+                int firstBase = NumberBaseOperations.GetBase(firstBaseStr);
+                int secondBase = NumberBaseOperations.GetBase(secondBaseStr);
+                int resultBase = NumberBaseOperations.GetBase(resultBaseStr);
+
+                // Проверяем, что введенные числа корректны для своих систем счисления
+                bool firstValid = NumberBaseOperations.IsValidInput(firstInput, firstBase);
+                bool secondValid = NumberBaseOperations.IsValidInput(secondInput, secondBase);
+
+                if (!firstValid || !secondValid)
                 {
                     txtResult.Text = "Неверный ввод!";
                     return;
                 }
 
-                // Переводим в десятичную
-                int firstValue = NumberBaseOperations.ConvertToDecimal(firstText, baseFirst);
-                int secondValue = NumberBaseOperations.ConvertToDecimal(secondText, baseSecond);
+                // Преобразуем числа в десятичные
+                int firstNumber = NumberBaseOperations.ConvertToDecimal(firstInput, firstBase);
+                int secondNumber = NumberBaseOperations.ConvertToDecimal(secondInput, secondBase);
 
-                // Выполняем операцию
+                // Выполняем выбранную операцию
                 string operation = cmbOperation.Text;
-                string result = NumberBaseOperations.PerformOperation(firstValue, secondValue, operation);
+                string result = NumberBaseOperations.PerformOperation(firstNumber, secondNumber, operation);
 
-                // Если сравнение — выводим строку
-                if (operation == "Сравнение")
-                {
-                    txtResult.Text = result;
-                    return;
-                }
 
-                // Остальные операции — это числа, их надо перевести в нужную систему
-                int resultValue = int.Parse(result);
-                txtResult.Text = NumberBaseOperations.ConvertFromDecimal(resultValue, baseResult);
+                // Преобразуем результат обратно в нужную систему счисления
+                int resultInt = int.Parse(result); // Преобразуем результат операции в число
+                string resultStr = NumberBaseOperations.ConvertFromDecimal(resultInt, resultBase); // Преобразуем в нужную систему
+
+                txtResult.Text = resultStr; // Выводим результат в текстовое поле
             }
             catch (FormatException)
             {

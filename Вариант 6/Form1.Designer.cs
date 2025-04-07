@@ -46,12 +46,11 @@
             txtFirst.Name = "txtFirst";
             txtFirst.Size = new Size(170, 27);
             txtFirst.TabIndex = 0;
-            this.txtFirst.TextChanged += new System.EventHandler(this.InputChanged);
-
+            txtFirst.TextChanged += InputChanged;
             // 
             // txtResult
             // 
-            txtResult.Location = new Point(160, 201);
+            txtResult.Location = new Point(169, 201);
             txtResult.Name = "txtResult";
             txtResult.Size = new Size(327, 27);
             txtResult.TabIndex = 2;
@@ -66,7 +65,7 @@
             cmbOperation.Size = new Size(138, 28);
             cmbOperation.TabIndex = 3;
             cmbOperation.Text = "Сложение";
-            this.cmbOperation.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
+            cmbOperation.SelectedIndexChanged += InputChanged;
             // 
             // comboBox1
             // 
@@ -77,7 +76,7 @@
             comboBox1.Size = new Size(151, 28);
             comboBox1.TabIndex = 4;
             comboBox1.Text = "Двоичная";
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
+            comboBox1.SelectedIndexChanged += InputChanged;
             // 
             // txtSecond
             // 
@@ -85,7 +84,7 @@
             txtSecond.Name = "txtSecond";
             txtSecond.Size = new Size(170, 27);
             txtSecond.TabIndex = 5;
-            this.txtSecond.TextChanged += new System.EventHandler(this.InputChanged);
+            txtSecond.TextChanged += InputChanged;
             // 
             // comboBox2
             // 
@@ -96,7 +95,7 @@
             comboBox2.Size = new Size(151, 28);
             comboBox2.TabIndex = 6;
             comboBox2.Text = "Двоичная";
-            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
+            comboBox2.SelectedIndexChanged += InputChanged;
             // 
             // label1
             // 
@@ -119,7 +118,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(48, 204);
+            label3.Location = new Point(81, 204);
             label3.Name = "label3";
             label3.Size = new Size(78, 20);
             label3.TabIndex = 9;
@@ -134,7 +133,7 @@
             comboBox3.Size = new Size(151, 28);
             comboBox3.TabIndex = 10;
             comboBox3.Text = "Двоичная";
-            this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.InputChanged);
+            comboBox3.SelectedIndexChanged += InputChanged;
             // 
             // Form1
             // 
