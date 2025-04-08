@@ -20,7 +20,7 @@ namespace Вариант_6
             {
                 return 10;
             }
-            else if (selectedItem == "Шестнадцатиричная")
+            else if (selectedItem == "Шеснадцатиричная")
             {
                 return 16;
             }

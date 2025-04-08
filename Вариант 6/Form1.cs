@@ -5,6 +5,7 @@ namespace Вариант_6
         public Form1()
         {
             InitializeComponent();
+
         }
 
         private void InputChanged(object sender, EventArgs e)
