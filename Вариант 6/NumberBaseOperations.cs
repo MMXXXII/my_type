@@ -3,104 +3,157 @@ using System.Text.RegularExpressions;
 
 namespace Вариант_6
 {
+    // Перечисление систем счисления
+    public enum NumberBase
+    {
+        Binary = 2,       // Двоичная система
+        Octal = 8,        // Восьмеричная система
+        Decimal = 10,     // Десятичная система
+        Hexadecimal = 16  // Шестнадцатеричная система
+    }
+
+    // Класс для операций с числами в разных системах счисления
     public class NumberBaseOperations
     {
-        // Метод для получения основания системы счисления по строковому значению
-        public static int GetBase(string selectedItem)
+        // Свойство: значение в десятичной системе
+        public int Value { get; set; }
+
+        // Конструктор, принимает значение
+        public NumberBaseOperations(int value)
         {
-            if (selectedItem == "Двоичная")
-            {
-                return 2;
-            }
-            else if (selectedItem == "Восьмиричная")
-            {
-                return 8;
-            }
-            else if (selectedItem == "Десятичная")
-            {
-                return 10;
-            }
-            else if (selectedItem == "Шеснадцатиричная")
-            {
-                return 16;
-            }
-            else
-            {
-                return 10; // по умолчанию десятичная система счисления
-            }
+            Value = value;
         }
 
-        // Метод для проверки валидности введённого значения в зависимости от системы счисления
+        // Проверка валидности строки в заданной системе счисления
         public static bool IsValidInput(string input, int numberBase)
         {
-            string pattern = "";
+            string allowedChars;
 
-            if (numberBase == 2)
+            // Определяем допустимые символы для каждой системы счисления
+            switch (numberBase)
             {
-                pattern = "^[01]*$";
-            }
-            else if (numberBase == 8)
-            {
-                pattern = "^[0-7]*$";
-            }
-            else if (numberBase == 10)
-            {
-                pattern = "^[0-9]*$";
-            }
-            else if (numberBase == 16)
-            {
-                pattern = "^[0-9A-Fa-f]*$";
-            }
-            else
-            {
-                throw new ArgumentException("Неправильная система счисления");
+                case 2:
+                    allowedChars = "01";
+                    break;
+                case 8:
+                    allowedChars = "01234567";
+                    break;
+                case 10:
+                    allowedChars = "0123456789";
+                    break;
+                case 16:
+                    allowedChars = "0123456789ABCDEFabcdef";
+                    break;
+                default:
+                    throw new ArgumentException("Неправильная система счисления");
             }
 
-            return Regex.IsMatch(input, pattern);
+            // Проверяем каждый символ входной строки
+            foreach (char c in input)
+            {
+                if (!allowedChars.Contains(c))
+                {
+                    return false; // Недопустимый символ
+                }
+            }
+
+            return true; // Все символы допустимы
         }
 
-        // Метод для преобразования числа из выбранной системы счисления в десятичную
-        public static int ConvertToDecimal(string input, int numberBase)
+        // Преобразование строки из заданной системы счисления в десятичную
+        public static int ConvertToDecimal(string input, NumberBase numberBase)
         {
-            return Convert.ToInt32(input, numberBase);
+            return Convert.ToInt32(input, (int)numberBase);
         }
 
-        // Метод для преобразования числа из десятичной системы счисления в целевую систему счисления
-        public static string ConvertFromDecimal(int value, int targetBase)
+        // Преобразование десятичного числа в строку в целевой системе счисления
+        public static string ConvertFromDecimal(int value, NumberBase targetBase)
         {
-            return Convert.ToString(value, targetBase).ToUpper(); // Преобразуем в строку и приводим к верхнему регистру
+            return Convert.ToString(value, (int)targetBase).ToUpper();
         }
 
-        // Метод для выполнения математических операций
+        // Выполнение арифметической или логической операции над двумя числами
         public static string PerformOperation(int a, int b, string operation)
         {
+            // Создание объектов для чисел
+            NumberBaseOperations opA = new NumberBaseOperations(a);
+            NumberBaseOperations opB = new NumberBaseOperations(b);
+
+            string result; // Строка для хранения результата
+
+            // Выполняем выбранную операцию
             if (operation == "Сложение")
             {
-                return (a + b).ToString();
+                NumberBaseOperations sum = opA + opB;
+                result = sum.Value.ToString();
             }
             else if (operation == "Вычитание")
             {
-                return (a - b).ToString();
+                NumberBaseOperations difference = opA - opB;
+                result = difference.Value.ToString();
             }
             else if (operation == "Умножение")
             {
-                return (a * b).ToString();
+                NumberBaseOperations product = opA * opB;
+                result = product.Value.ToString();
             }
-            else if (operation == "Сравнение")
+            else if (operation == "Деление")
             {
-                if (a == b)
+                if (b == 0)
                 {
-                    return "Числа равны";
+                    result = "Деление на ноль";
                 }
                 else
                 {
-                    return "Числа не равны";
+                    NumberBaseOperations division = opA / opB;
+                    result = division.Value.ToString();
+                }
+            }
+            else if (operation == "Сравнение")
+            {
+                // Сравнение чисел
+                if (a == b)
+                {
+                    result = "Числа равны";
+                }
+                else
+                {
+                    result = "Числа не равны";
                 }
             }
             else
             {
-                return "Операция не выбрана";
+                result = "Операция не выбрана";
             }
+
+            return result; // Возврат результата
+        }
+
+        // Перегрузка оператора сложения
+        public static NumberBaseOperations operator +(NumberBaseOperations a, NumberBaseOperations b)
+        {
+            return new NumberBaseOperations(a.Value + b.Value);
+        }
+
+        // Перегрузка оператора вычитания
+        public static NumberBaseOperations operator -(NumberBaseOperations a, NumberBaseOperations b)
+        {
+            return new NumberBaseOperations(a.Value - b.Value);
+        }
+
+        // Перегрузка оператора умножения
+        public static NumberBaseOperations operator *(NumberBaseOperations a, NumberBaseOperations b)
+        {
+            return new NumberBaseOperations(a.Value * b.Value);
+        }
+
+        // Перегрузка оператора деления
+        public static NumberBaseOperations operator /(NumberBaseOperations a, NumberBaseOperations b)
+        {
+            if (b.Value == 0)
+                throw new DivideByZeroException("Деление на ноль невозможно");
+
+            return new NumberBaseOperations(a.Value / b.Value);
         }
     }
 }

@@ -2,61 +2,37 @@ namespace Вариант_6
 {
     public partial class Form1 : Form
     {
+        // Конструктор формы
         public Form1()
         {
-            InitializeComponent();
-
+            InitializeComponent(); // Инициализация компонентов формы
         }
 
+        // Обработчик события изменения ввода пользователем (в любом из полей)
         private void InputChanged(object sender, EventArgs e)
         {
-            Calculate();
+            Calculate(); // Пересчитываем результат при изменении входных данных
         }
-
+       
+        // Метод, выполняющий все вычисления и обновляющий результат
         private void Calculate()
         {
             try
             {
-                // Получаем значения из текстовых полей, если пусто — ставим 0
-                string firstInput = txtFirst.Text;
-                string secondInput = txtSecond.Text;
+                // Считывание первого введённого числа, замена пустого ввода на "0"
+                string firstInput = string.IsNullOrWhiteSpace(txtFirst.Text) ? "0" : txtFirst.Text;
 
-                if (string.IsNullOrWhiteSpace(firstInput))
-                {
-                    firstInput = "0";
-                }
+                // Считывание второго введённого числа, замена пустого ввода на "0"
+                string secondInput = string.IsNullOrWhiteSpace(txtSecond.Text) ? "0" : txtSecond.Text;
 
-                if (string.IsNullOrWhiteSpace(secondInput))
-                {
-                    secondInput = "0";
-                }
+                // Получаем выбранные системы счисления из выпадающих списков
+                NumberBase firstBase = GetSelectedBase(comboBox1);
+                NumberBase secondBase = GetSelectedBase(comboBox2);
+                NumberBase resultBase = GetSelectedBase(comboBox3);
 
-                // Смотрим, какие системы счисления выбраны (с использованием обычных условий)
-                string firstBaseStr = "Десятичная";
-                if (comboBox1.SelectedItem != null)
-                {
-                    firstBaseStr = comboBox1.SelectedItem.ToString();
-                }
-
-                string secondBaseStr = "Десятичная";
-                if (comboBox2.SelectedItem != null)
-                {
-                    secondBaseStr = comboBox2.SelectedItem.ToString();
-                }
-
-                string resultBaseStr = "Десятичная";
-                if (comboBox3.SelectedItem != null)
-                {
-                    resultBaseStr = comboBox3.SelectedItem.ToString();
-                }
-
-                int firstBase = NumberBaseOperations.GetBase(firstBaseStr);
-                int secondBase = NumberBaseOperations.GetBase(secondBaseStr);
-                int resultBase = NumberBaseOperations.GetBase(resultBaseStr);
-
-                // Проверяем, что введенные числа корректны для своих систем счисления
-                bool firstValid = NumberBaseOperations.IsValidInput(firstInput, firstBase);
-                bool secondValid = NumberBaseOperations.IsValidInput(secondInput, secondBase);
+                // Проверка корректности ввода для обеих систем счисления
+                bool firstValid = NumberBaseOperations.IsValidInput(firstInput, (int)firstBase);
+                bool secondValid = NumberBaseOperations.IsValidInput(secondInput, (int)secondBase);
 
                 if (!firstValid || !secondValid)
                 {
@@ -64,33 +40,69 @@ namespace Вариант_6
                     return;
                 }
 
-                // Преобразуем числа в десятичные
+                // Преобразуем оба числа в десятичную систему
                 int firstNumber = NumberBaseOperations.ConvertToDecimal(firstInput, firstBase);
                 int secondNumber = NumberBaseOperations.ConvertToDecimal(secondInput, secondBase);
 
-                // Выполняем выбранную операцию
+                // Получаем выбранную пользователем операцию (арифметика или сравнение)
                 string operation = cmbOperation.Text;
+
+                // Выполняем операцию и получаем результат в строковом виде
                 string result = NumberBaseOperations.PerformOperation(firstNumber, secondNumber, operation);
 
+                // Обработка случаев сравнения и деления на ноль — их не нужно конвертировать в другую систему
+                if (operation == "Сравнение" || result == "Деление на ноль")
+                {
+                    txtResult.Text = result;
+                    return;
+                }
 
                 // Преобразуем результат обратно в нужную систему счисления
-                int resultInt = int.Parse(result); // Преобразуем результат операции в число
-                string resultStr = NumberBaseOperations.ConvertFromDecimal(resultInt, resultBase); // Преобразуем в нужную систему
+                int resultInt = int.Parse(result);
+                string resultStr = NumberBaseOperations.ConvertFromDecimal(resultInt, resultBase);
 
-                txtResult.Text = resultStr; // Выводим результат в текстовое поле
+                // Выводим результат в соответствующее текстовое поле
+                txtResult.Text = resultStr;
             }
             catch (FormatException)
             {
+                // Обработка ошибки преобразования формата
                 txtResult.Text = "Ошибка ввода";
             }
             catch (OverflowException)
             {
+                // Обработка слишком большого числа
                 txtResult.Text = "Слишком большое число";
             }
             catch (Exception)
             {
+                // Общая обработка любых других исключений
                 txtResult.Text = "Непредвиденная ошибка";
             }
+        }
+
+        // Метод для определения системы счисления на основе выбранного значения в ComboBox
+        private NumberBase GetSelectedBase(ComboBox comboBox)
+        {
+            if (comboBox.SelectedItem != null)
+            {
+                // Сопоставление строк с элементами перечисления NumberBase
+                switch (comboBox.SelectedItem.ToString())
+                {
+                    case "Двоичная":
+                        return NumberBase.Binary;
+                    case "Восьмиричная":
+                        return NumberBase.Octal;
+                    case "Десятичная":
+                        return NumberBase.Decimal;
+                    case "Шеснадцатиричная":
+                        return NumberBase.Hexadecimal;
+                    default:
+                        return NumberBase.Decimal; // По умолчанию — десятичная
+                }
+            }
+
+            return NumberBase.Decimal; // Возврат десятичной системы, если ничего не выбрано
         }
     }
 }
