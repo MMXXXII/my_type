@@ -5,17 +5,10 @@ namespace Вариант_6
 {
     public partial class Form1 : Form
     {
-        // Конструктор формы
         public Form1()
         {
             InitializeComponent();
-
-            // Устанавливаем только начальный индекс для операции,
-            // так как она точно имеет элементы, заданные в дизайнере
-            if (cmbOperation.Items.Count > 0)
-            {
-                cmbOperation.SelectedIndex = 0;
-            }
+            cmbOperation.SelectedIndex = 0;
         }
 
         private void InputChanged(object sender, EventArgs e)
@@ -23,142 +16,97 @@ namespace Вариант_6
             Calculate();
         }
 
-        // ... остальной код остается без изменений ...
-
+        // Основной метод вычислений
         private void Calculate()
         {
-            try
+            // Если оба поля пустые - выводим 0
+            if (string.IsNullOrEmpty(txtFirst.Text) && string.IsNullOrEmpty(txtSecond.Text))
             {
-                // Если оба поля пустые, показываем 0
-                if (string.IsNullOrWhiteSpace(txtFirst.Text) && string.IsNullOrWhiteSpace(txtSecond.Text))
-                {
-                    txtResult.Text = "0";
-                    return;
-                }
+                txtResult.Text = "0";
+                return;
+            }
 
                 // Получаем системы счисления
-                NumberSystem.NumberBase firstBase = GetBaseFromString(comboBox1.Text);
-                NumberSystem.NumberBase secondBase = GetBaseFromString(comboBox2.Text);
-                NumberSystem.NumberBase resultBase = GetBaseFromString(comboBox3.Text);
+                int firstBase = NumberSystem.GetBaseFromString(comboBox1.Text);
+                int secondBase = NumberSystem.GetBaseFromString(comboBox2.Text);
+                int resultBase = NumberSystem.GetBaseFromString(comboBox3.Text);
 
-                // Функция проверки корректности ввода для заданной системы счисления
-                bool IsValidForBase(string input, NumberSystem.NumberBase baseSystem)
+                // Если второе число пустое - просто конвертируем первое
+                if (string.IsNullOrEmpty(txtSecond.Text))
                 {
-                    switch (baseSystem)
-                    {
-                        case NumberSystem.NumberBase.Binary:
-                            return System.Text.RegularExpressions.Regex.IsMatch(input, "^[01]+$");
-                        case NumberSystem.NumberBase.Octal:
-                            return System.Text.RegularExpressions.Regex.IsMatch(input, "^[0-7]+$");
-                        case NumberSystem.NumberBase.Decimal:
-                            return System.Text.RegularExpressions.Regex.IsMatch(input, "^[0-9]+$");
-                        case NumberSystem.NumberBase.Hexadecimal:
-                            return System.Text.RegularExpressions.Regex.IsMatch(input.ToUpper(), "^[0-9A-F]+$");
-                        default:
-                            return false;
-                    }
-                }
-
-                // Если второе поле пустое, проверяем и показываем первое число
-                if (string.IsNullOrWhiteSpace(txtSecond.Text))
-                {
-                    string input = txtFirst.Text;
-                    if (!IsValidForBase(input, firstBase))
+                    if (!NumberSystem.IsValidInput(txtFirst.Text, firstBase))
                     {
                         txtResult.Text = "Введена не та цифра";
                         return;
                     }
-                    try
-                    {
-                        var firstNumber = new NumberSystem(input, firstBase);
-                        txtResult.Text = firstNumber.ToBase(resultBase);
-                    }
-                    catch
-                    {
-                        txtResult.Text = "0";
-                    }
+
+                    var num = new NumberSystem(txtFirst.Text, firstBase);
+                    txtResult.Text = num.ToBase(resultBase);
                     return;
                 }
 
-                // Если первое поле пустое, проверяем и показываем второе число
-                if (string.IsNullOrWhiteSpace(txtFirst.Text))
+                // Если первое число пустое - просто конвертируем второе
+                if (string.IsNullOrEmpty(txtFirst.Text))
                 {
-                    string input = txtSecond.Text;
-                    if (!IsValidForBase(input, secondBase))
+                    if (!NumberSystem.IsValidInput(txtSecond.Text, secondBase))
                     {
                         txtResult.Text = "Введена не та цифра";
                         return;
                     }
-                    try
-                    {
-                        var secondNumber = new NumberSystem(input, secondBase);
-                        txtResult.Text = secondNumber.ToBase(resultBase);
-                    }
-                    catch
-                    {
-                        txtResult.Text = "0";
-                    }
+
+                    var num = new NumberSystem(txtSecond.Text, secondBase);
+                    txtResult.Text = num.ToBase(resultBase);
                     return;
                 }
 
-                // Проверяем корректность обоих чисел для их систем счисления
-                if (!IsValidForBase(txtFirst.Text, firstBase) || !IsValidForBase(txtSecond.Text, secondBase))
+                // Проверяем правильность обоих чисел
+                if (!NumberSystem.IsValidInput(txtFirst.Text, firstBase) ||
+                    !NumberSystem.IsValidInput(txtSecond.Text, secondBase))
                 {
                     txtResult.Text = "Введена не та цифра";
                     return;
                 }
 
-                // Если оба поля заполнены корректно, выполняем выбранную операцию
+                // Создаем числа
                 var num1 = new NumberSystem(txtFirst.Text, firstBase);
                 var num2 = new NumberSystem(txtSecond.Text, secondBase);
 
-                switch (cmbOperation.Text)
+                // Выполняем операцию
+                if (cmbOperation.Text == "Сложение")
                 {
-                    case "Сложение":
-                        var sum = num1 + num2;
-                        txtResult.Text = sum.ToBase(resultBase);
-                        break;
-
-                    case "Вычитание":
-                        var difference = num1 - num2;
-                        txtResult.Text = difference.ToBase(resultBase);
-                        break;
-
-                    case "Умножение":
-                        var product = num1 * num2;
-                        txtResult.Text = product.ToBase(resultBase);
-                        break;
-
-                    case "Сравнение":
-                        if (num1 == num2)
-                            txtResult.Text = "Числа равны";
-                        else
-                            txtResult.Text = "Числа не равны";
-                        break;
+                    // Складываем числа и переводим результат в нужную систему счисления
+                    NumberSystem result = num1 + num2;
+                    txtResult.Text = result.ToBase(resultBase);
                 }
-            }
-            catch
-            {
-                txtResult.Text = "Введена не та цифра";
-            }
-        }
-
-        // Вспомогательный метод для преобразования русского названия системы счисления в NumberBase
-        private NumberSystem.NumberBase GetBaseFromString(string baseStr)
-        {
-            switch (baseStr)
-            {
-                case "Двоичная":
-                    return NumberSystem.NumberBase.Binary;
-                case "Восьмиричная":
-                    return NumberSystem.NumberBase.Octal;
-                case "Десятичная":
-                    return NumberSystem.NumberBase.Decimal;
-                case "Шеснадцатиричная":
-                    return NumberSystem.NumberBase.Hexadecimal;
-                default:
-                    return NumberSystem.NumberBase.Decimal;
+                else if (cmbOperation.Text == "Вычитание")
+                {
+                    // Вычитаем числа и переводим результат в нужную систему счисления
+                    NumberSystem result = num1 - num2;
+                    txtResult.Text = result.ToBase(resultBase);
+                }
+                else if (cmbOperation.Text == "Умножение")
+                {
+                    // Умножаем числа и переводим результат в нужную систему счисления
+                    NumberSystem result = num1 * num2;
+                    txtResult.Text = result.ToBase(resultBase);
+                }
+                else if (cmbOperation.Text == "Сравнение")
+                {
+                    // Сравниваем числа и выводим текстовый результат
+                    if (num1 == num2)
+                    {
+                        txtResult.Text = "Числа равны";
+                    }
+                    else
+                    {
+                        txtResult.Text = "Числа не равны";
+                    }
+                }
+                else
+                {
+                    // Если операция не выбрана
+                    txtResult.Text = "Выберите операцию";
+                }
             }
         }
     }
-}

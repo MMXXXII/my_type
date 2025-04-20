@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-// Current Date and Time (UTC - YYYY-MM-DD HH:MM:SS formatted): 2025-04-20 02:08:50
+// Current Date and Time (UTC): 2025-04-20 12:08:56
 // Current User's Login: MMXXXII
 
 namespace Вариант_6.Tests
@@ -8,7 +8,7 @@ namespace Вариант_6.Tests
     public class NumberSystemTests
     {
         [TestMethod()]
-        public void GetBaseTest()
+        public void GetBaseFromStringTest()
         {
             Assert.AreEqual(2, NumberSystem.GetBaseFromString("Двоичная"));
             Assert.AreEqual(8, NumberSystem.GetBaseFromString("Восьмиричная"));
@@ -21,40 +21,74 @@ namespace Вариант_6.Tests
         public void IsValidInputTest()
         {
             // Двоичная система
-            Assert.AreEqual(true, NumberSystem.IsValidInput("1010", 2));
-            Assert.AreEqual(false, NumberSystem.IsValidInput("102", 2));
+            Assert.IsTrue(NumberSystem.IsValidInput("1010", 2));
+            Assert.IsFalse(NumberSystem.IsValidInput("102", 2));
 
             // Восьмеричная система
-            Assert.AreEqual(true, NumberSystem.IsValidInput("765", 8));
-            Assert.AreEqual(false, NumberSystem.IsValidInput("899", 8));
+            Assert.IsTrue(NumberSystem.IsValidInput("765", 8));
+            Assert.IsFalse(NumberSystem.IsValidInput("899", 8));
 
             // Десятичная система
-            Assert.AreEqual(true, NumberSystem.IsValidInput("1234567890", 10));
-            Assert.AreEqual(false, NumberSystem.IsValidInput("12A", 10));
+            Assert.IsTrue(NumberSystem.IsValidInput("1234567890", 10));
+            Assert.IsFalse(NumberSystem.IsValidInput("12A", 10));
 
             // Шестнадцатиричная система
-            Assert.AreEqual(true, NumberSystem.IsValidInput("1A3F", 16));
-            Assert.AreEqual(false, NumberSystem.IsValidInput("XYZ", 16));
+            Assert.IsTrue(NumberSystem.IsValidInput("1A3F", 16));
+            Assert.IsFalse(NumberSystem.IsValidInput("XYZ", 16));
+
+            // Пустая строка
+            Assert.IsFalse(NumberSystem.IsValidInput("", 10));
+            Assert.IsFalse(NumberSystem.IsValidInput(null, 10));
         }
 
         [TestMethod()]
-        public void ConvertToDecimalTest()
+        public void ConversionTest()
         {
-            Assert.AreEqual(10, NumberSystem.ConvertToDecimal("1010", 2));
-            Assert.AreEqual(15, NumberSystem.ConvertToDecimal("17", 8));
-            Assert.AreEqual(255, NumberSystem.ConvertToDecimal("255", 10));
-            Assert.AreEqual(255, NumberSystem.ConvertToDecimal("FF", 16));
+            // Тестируем конструктор и преобразования
+            var binary = new NumberSystem("1010", 2);
+            Assert.AreEqual("1010", binary.ToBase(2));
+            Assert.AreEqual("12", binary.ToBase(8));
+            Assert.AreEqual("10", binary.ToBase(10));
+            Assert.AreEqual("A", binary.ToBase(16));
+
         }
 
         [TestMethod()]
-        public void PerformOperationTest()
+        public void ArithmeticOperationsTest()
         {
-            Assert.AreEqual("8", NumberSystem.PerformOperation(5, 3, "Сложение"));
-            Assert.AreEqual("2", NumberSystem.PerformOperation(5, 3, "Вычитание"));
-            Assert.AreEqual("15", NumberSystem.PerformOperation(5, 3, "Умножение"));
-            Assert.AreEqual("Числа равны", NumberSystem.PerformOperation(5, 5, "Сравнение"));
-            Assert.AreEqual("Числа не равны", NumberSystem.PerformOperation(5, 3, "Сравнение"));
-            Assert.AreEqual("Операция не выбрана", NumberSystem.PerformOperation(5, 3, " "));
+            var num1 = new NumberSystem("10", 10); // 10
+            var num2 = new NumberSystem("5", 10);  // 5
+
+            // Сложение
+            var sum = num1 + num2;
+            Assert.AreEqual("15", sum.ToBase(10));
+
+            // Вычитание
+            var diff = num1 - num2;
+            Assert.AreEqual("5", diff.ToBase(10));
+
+            // Умножение
+            var mult = num1 * num2;
+            Assert.AreEqual("50", mult.ToBase(10));
+
+            // Проверка в разных системах счисления
+            Assert.AreEqual("1111", sum.ToBase(2));
+            Assert.AreEqual("17", sum.ToBase(8));
+            Assert.AreEqual("F", sum.ToBase(16));
+        }
+
+        [TestMethod()]
+        public void InvalidInputTest()
+        {
+            // Проверка обработки некорректного ввода
+            var invalidBinary = new NumberSystem("2", 2);
+            Assert.AreEqual("0", invalidBinary.ToBase(10));
+
+            var invalidHex = new NumberSystem("XYZ", 16);
+            Assert.AreEqual("0", invalidHex.ToBase(10));
+
+            var emptyString = new NumberSystem("", 10);
+            Assert.AreEqual("0", emptyString.ToBase(10));
         }
     }
 }
