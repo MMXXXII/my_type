@@ -1,3 +1,6 @@
+using System;
+using System.Windows.Forms;
+
 namespace Вариант_6
 {
     public partial class Form1 : Form
@@ -5,104 +8,157 @@ namespace Вариант_6
         // Конструктор формы
         public Form1()
         {
-            InitializeComponent(); // Инициализация компонентов формы
+            InitializeComponent();
+
+            // Устанавливаем только начальный индекс для операции,
+            // так как она точно имеет элементы, заданные в дизайнере
+            if (cmbOperation.Items.Count > 0)
+            {
+                cmbOperation.SelectedIndex = 0;
+            }
         }
 
-        // Обработчик события изменения ввода пользователем (в любом из полей)
         private void InputChanged(object sender, EventArgs e)
         {
-            Calculate(); // Пересчитываем результат при изменении входных данных
+            Calculate();
         }
-       
-        // Метод, выполняющий все вычисления и обновляющий результат
+
+        // ... остальной код остается без изменений ...
+
         private void Calculate()
         {
             try
             {
-                // Считывание первого введённого числа, замена пустого ввода на "0"
-                string firstInput = string.IsNullOrWhiteSpace(txtFirst.Text) ? "0" : txtFirst.Text;
-
-                // Считывание второго введённого числа, замена пустого ввода на "0"
-                string secondInput = string.IsNullOrWhiteSpace(txtSecond.Text) ? "0" : txtSecond.Text;
-
-                // Получаем выбранные системы счисления из выпадающих списков
-                NumberBase firstBase = GetSelectedBase(comboBox1);
-                NumberBase secondBase = GetSelectedBase(comboBox2);
-                NumberBase resultBase = GetSelectedBase(comboBox3);
-
-                // Проверка корректности ввода для обеих систем счисления
-                bool firstValid = NumberBaseOperations.IsValidInput(firstInput, (int)firstBase);
-                bool secondValid = NumberBaseOperations.IsValidInput(secondInput, (int)secondBase);
-
-                if (!firstValid || !secondValid)
+                // Если оба поля пустые, показываем 0
+                if (string.IsNullOrWhiteSpace(txtFirst.Text) && string.IsNullOrWhiteSpace(txtSecond.Text))
                 {
-                    txtResult.Text = "Неверный ввод!";
+                    txtResult.Text = "0";
                     return;
                 }
 
-                // Преобразуем оба числа в десятичную систему
-                int firstNumber = NumberBaseOperations.ConvertToDecimal(firstInput, firstBase);
-                int secondNumber = NumberBaseOperations.ConvertToDecimal(secondInput, secondBase);
+                // Получаем системы счисления
+                NumberSystem.NumberBase firstBase = GetBaseFromString(comboBox1.Text);
+                NumberSystem.NumberBase secondBase = GetBaseFromString(comboBox2.Text);
+                NumberSystem.NumberBase resultBase = GetBaseFromString(comboBox3.Text);
 
-                // Получаем выбранную пользователем операцию (арифметика или сравнение)
-                string operation = cmbOperation.Text;
-
-                // Выполняем операцию и получаем результат в строковом виде
-                string result = NumberBaseOperations.PerformOperation(firstNumber, secondNumber, operation);
-
-                // Обработка случаев сравнения и деления на ноль — их не нужно конвертировать в другую систему
-                if (operation == "Сравнение" || result == "Деление на ноль")
+                // Функция проверки корректности ввода для заданной системы счисления
+                bool IsValidForBase(string input, NumberSystem.NumberBase baseSystem)
                 {
-                    txtResult.Text = result;
+                    switch (baseSystem)
+                    {
+                        case NumberSystem.NumberBase.Binary:
+                            return System.Text.RegularExpressions.Regex.IsMatch(input, "^[01]+$");
+                        case NumberSystem.NumberBase.Octal:
+                            return System.Text.RegularExpressions.Regex.IsMatch(input, "^[0-7]+$");
+                        case NumberSystem.NumberBase.Decimal:
+                            return System.Text.RegularExpressions.Regex.IsMatch(input, "^[0-9]+$");
+                        case NumberSystem.NumberBase.Hexadecimal:
+                            return System.Text.RegularExpressions.Regex.IsMatch(input.ToUpper(), "^[0-9A-F]+$");
+                        default:
+                            return false;
+                    }
+                }
+
+                // Если второе поле пустое, проверяем и показываем первое число
+                if (string.IsNullOrWhiteSpace(txtSecond.Text))
+                {
+                    string input = txtFirst.Text;
+                    if (!IsValidForBase(input, firstBase))
+                    {
+                        txtResult.Text = "Введена не та цифра";
+                        return;
+                    }
+                    try
+                    {
+                        var firstNumber = new NumberSystem(input, firstBase);
+                        txtResult.Text = firstNumber.ToBase(resultBase);
+                    }
+                    catch
+                    {
+                        txtResult.Text = "0";
+                    }
                     return;
                 }
 
-                // Преобразуем результат обратно в нужную систему счисления
-                int resultInt = int.Parse(result);
-                string resultStr = NumberBaseOperations.ConvertFromDecimal(resultInt, resultBase);
+                // Если первое поле пустое, проверяем и показываем второе число
+                if (string.IsNullOrWhiteSpace(txtFirst.Text))
+                {
+                    string input = txtSecond.Text;
+                    if (!IsValidForBase(input, secondBase))
+                    {
+                        txtResult.Text = "Введена не та цифра";
+                        return;
+                    }
+                    try
+                    {
+                        var secondNumber = new NumberSystem(input, secondBase);
+                        txtResult.Text = secondNumber.ToBase(resultBase);
+                    }
+                    catch
+                    {
+                        txtResult.Text = "0";
+                    }
+                    return;
+                }
 
-                // Выводим результат в соответствующее текстовое поле
-                txtResult.Text = resultStr;
+                // Проверяем корректность обоих чисел для их систем счисления
+                if (!IsValidForBase(txtFirst.Text, firstBase) || !IsValidForBase(txtSecond.Text, secondBase))
+                {
+                    txtResult.Text = "Введена не та цифра";
+                    return;
+                }
+
+                // Если оба поля заполнены корректно, выполняем выбранную операцию
+                var num1 = new NumberSystem(txtFirst.Text, firstBase);
+                var num2 = new NumberSystem(txtSecond.Text, secondBase);
+
+                switch (cmbOperation.Text)
+                {
+                    case "Сложение":
+                        var sum = num1 + num2;
+                        txtResult.Text = sum.ToBase(resultBase);
+                        break;
+
+                    case "Вычитание":
+                        var difference = num1 - num2;
+                        txtResult.Text = difference.ToBase(resultBase);
+                        break;
+
+                    case "Умножение":
+                        var product = num1 * num2;
+                        txtResult.Text = product.ToBase(resultBase);
+                        break;
+
+                    case "Сравнение":
+                        if (num1 == num2)
+                            txtResult.Text = "Числа равны";
+                        else
+                            txtResult.Text = "Числа не равны";
+                        break;
+                }
             }
-            catch (FormatException)
+            catch
             {
-                // Обработка ошибки преобразования формата
-                txtResult.Text = "Ошибка ввода";
-            }
-            catch (OverflowException)
-            {
-                // Обработка слишком большого числа
-                txtResult.Text = "Слишком большое число";
-            }
-            catch (Exception)
-            {
-                // Общая обработка любых других исключений
-                txtResult.Text = "Непредвиденная ошибка";
+                txtResult.Text = "Введена не та цифра";
             }
         }
 
-        // Метод для определения системы счисления на основе выбранного значения в ComboBox
-        private NumberBase GetSelectedBase(ComboBox comboBox)
+        // Вспомогательный метод для преобразования русского названия системы счисления в NumberBase
+        private NumberSystem.NumberBase GetBaseFromString(string baseStr)
         {
-            if (comboBox.SelectedItem != null)
+            switch (baseStr)
             {
-                // Сопоставление строк с элементами перечисления NumberBase
-                switch (comboBox.SelectedItem.ToString())
-                {
-                    case "Двоичная":
-                        return NumberBase.Binary;
-                    case "Восьмиричная":
-                        return NumberBase.Octal;
-                    case "Десятичная":
-                        return NumberBase.Decimal;
-                    case "Шеснадцатиричная":
-                        return NumberBase.Hexadecimal;
-                    default:
-                        return NumberBase.Decimal; // По умолчанию — десятичная
-                }
+                case "Двоичная":
+                    return NumberSystem.NumberBase.Binary;
+                case "Восьмиричная":
+                    return NumberSystem.NumberBase.Octal;
+                case "Десятичная":
+                    return NumberSystem.NumberBase.Decimal;
+                case "Шеснадцатиричная":
+                    return NumberSystem.NumberBase.Hexadecimal;
+                default:
+                    return NumberSystem.NumberBase.Decimal;
             }
-
-            return NumberBase.Decimal; // Возврат десятичной системы, если ничего не выбрано
         }
     }
 }
