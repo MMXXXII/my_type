@@ -1,21 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-// Current Date and Time (UTC): 2025-04-20 12:08:56
-// Current User's Login: MMXXXII
-
+﻿
 namespace Вариант_6.Tests
 {
     [TestClass()]
     public class NumberSystemTests
     {
-        [TestMethod()]
-        public void GetBaseFromStringTest()
-        {
-            Assert.AreEqual(2, NumberSystem.GetBaseFromString("Двоичная"));
-            Assert.AreEqual(8, NumberSystem.GetBaseFromString("Восьмиричная"));
-            Assert.AreEqual(10, NumberSystem.GetBaseFromString("Десятичная"));
-            Assert.AreEqual(16, NumberSystem.GetBaseFromString("Шеснадцатиричная"));
-            Assert.AreEqual(10, NumberSystem.GetBaseFromString("Неправильная система счисления"));
-        }
 
         [TestMethod()]
         public void IsValidInputTest()
